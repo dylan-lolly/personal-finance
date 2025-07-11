@@ -44,19 +44,20 @@ CREATE TABLE account (
 	account_number varchar(25) NULL UNIQUE,
 	routing_number varchar(12) NULL,
 	name varchar (200) NOT NULL,
-	balance decimal(10,2) NOT NULL,
-	available_balance decimal (10,2) NULL,
+	due_balance decimal(20,2) NOT NULL,
+	total_balance decimal (20,2) NULL,
     apr decimal (10,2) NULL,
     apy decimal (10,2) NULL,
     payment_due_date DATE NULL,
     account_type_id int NOT NULL,
-    user_id int NOT NULL,
-    bank_id int NOT NULL,
+    bank_id int NULL,
+	user_id int NOT NULL,
 	CONSTRAINT PK_product PRIMARY KEY (product_id),
     CONSTRAINT FK_account_users FOREIGN KEY (user_id) REFERENCES (user_id),
     CONSTRAINT FK_account_bank FOREIGN KEY (bank_id) REFERENCES (bank_id),
     CONSTRAINT FK_account_account_type FOREIGN KEY (account_type_id) REFERENCES (account_type_id)
 );
+-- For credit cards derive available balance from total - due
 
 -- category
 CREATE TABLE category (
@@ -157,7 +158,7 @@ INSERT INTO users (username,password_hash,role, name, address, city, state_code,
 INSERT INTO bank (name, nickname, user_id) VALUES 
 
 -- Accounts
-INSERT INTO account (account_number, routing_number, name, balance, available_balance, apr, apy, payment_due_date, account_type_id, bank_id, user_id) VALUES
+INSERT INTO account (account_number, routing_number, name, due_balance, total_balance, apr, apy, payment_due_date, account_type_id, bank_id, user_id) VALUES
     ();
 
 -- Categories
