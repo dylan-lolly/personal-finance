@@ -35,7 +35,7 @@ CREATE TABLE bank (
 	nickname varchar(200) NULL,
 	user_id int NOT NULL,
 	CONSTRAINT PK_bank PRIMARY KEY (bank_id),
-    CONSTRAINT FK_bank_users FOREIGN KEY (user_id) REFERENCES (user_id)
+    CONSTRAINT FK_bank_users FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- account
@@ -53,9 +53,9 @@ CREATE TABLE account (
     bank_id int NULL,
 	user_id int NOT NULL,
 	CONSTRAINT PK_product PRIMARY KEY (product_id),
-    CONSTRAINT FK_account_users FOREIGN KEY (user_id) REFERENCES (user_id),
-    CONSTRAINT FK_account_bank FOREIGN KEY (bank_id) REFERENCES (bank_id),
-    CONSTRAINT FK_account_account_type FOREIGN KEY (account_type_id) REFERENCES (account_type_id)
+    CONSTRAINT FK_account_users FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT FK_account_bank FOREIGN KEY (bank_id) REFERENCES bank(bank_id),
+    CONSTRAINT FK_account_account_type FOREIGN KEY (account_type_id) REFERENCES account_type(account_type_id)
 );
 -- For credit cards derive available balance from total - due
 
@@ -102,9 +102,9 @@ CREATE TABLE transactions (
 	category_id int NOT NULL,
 	user_id int NOT NULL,
 	CONSTRAINT PK_transactions PRIMARY KEY (transactions_id),
-	CONSTRAINT FK_transactions_account FOREIGN KEY (account_id) REFERENCES (account_id),
-	CONSTRAINT FK_transactions_category FOREIGN KEY (category_id) REFERENCES (category_id),
-	CONSTRAINT FK_transactions_user FOREIGN KEY (user_id) REFERENCES (user_id)
+	CONSTRAINT FK_transactions_account FOREIGN KEY (account_id) REFERENCES account(account_id),
+	CONSTRAINT FK_transactions_category FOREIGN KEY (category_id) REFERENCES category(category_id),
+	CONSTRAINT FK_transactions_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- planned_expense
@@ -118,9 +118,9 @@ CREATE TABLE planned_expenses (
 	expense_desc varchar (500) NULL,
 	user_id int NOT NULL
 	CONSTRAINT PK_planned_expense PRIMARY KEY (planned_expense_id),
-	CONSTRAINT FK_planned_expense_time_span FOREIGN KEY (time_span_id) REFERENCES (time_span_id),
-	CONSTRAINT FK_planned_expense_category FOREIGN KEY (category_id) REFERENCES (category_id),
-	CONSTRAINT FK_planned_expense_user FOREIGN KEY (user_id) REFERENCES (user_id)
+	CONSTRAINT FK_planned_expense_time_span FOREIGN KEY (time_span_id) REFERENCES time_span(time_span_id),
+	CONSTRAINT FK_planned_expense_category FOREIGN KEY (category_id) REFERENCES category(category_id),
+	CONSTRAINT FK_planned_expense_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 -- Derive a 'per_month_frequency decimal (10,2)' collumn when collecting 'frequency' and 'time-span' by mulitplying the frequency by the time-span multiple.
 -- This will be used to find the 'monthly_amount decimal (10,2)' 
@@ -138,10 +138,10 @@ CREATE TABLE recurring_payment (
 	link varchar (500) NULL,
 	user_id int NOT NULL
 	CONSTRAINT PK_recurring_payment PRIMARY KEY (recurring_payment_id),
-	CONSTRAINT FK_reccuring_payment_account FOREIGN KEY (account_id) REFERENCES (account_id),
-	CONSTRAINT FK_reccuring_payment_category FOREIGN KEY (category_id) REFERENCES (category_id),
-	CONSTRAINT FK_reccuring_payment_payment_type FOREIGN KEY (recurring_payment_id) REFERENCES (recurring_payment_id),
-	CONSTRAINT FK_reccuring_payment_user FOREIGN KEY (user_id) REFERENCES (user_id)
+	CONSTRAINT FK_reccuring_payment_account FOREIGN KEY (account_id) REFERENCES account(account_id),
+	CONSTRAINT FK_reccuring_payment_category FOREIGN KEY (category_id) REFERENCES category(category_id),
+	CONSTRAINT FK_reccuring_payment_payment_type FOREIGN KEY (payment_type_id) REFERENCES payment_type(payment_type_id),
+	CONSTRAINT FK_reccuring_payment_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- *************************************************************************************************
