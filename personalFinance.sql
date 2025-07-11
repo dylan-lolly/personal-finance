@@ -32,7 +32,7 @@ CREATE TABLE users (
 CREATE TABLE bank (
 	bank_id SERIAL,
 	name varchar(70) NOT NULL UNIQUE,
-	nickname varchar(200) NOT NULL,
+	nickname varchar(200) NULL,
 	user_id int NOT NULL,
 	CONSTRAINT PK_bank PRIMARY KEY (bank_id),
     CONSTRAINT FK_bank_users FOREIGN KEY (user_id) REFERENCES (user_id)
@@ -41,11 +41,11 @@ CREATE TABLE bank (
 -- account
 CREATE TABLE account (
 	account_id SERIAL,
-	account_number varchar(20) NULL UNIQUE,
-	routing_number varchar(10) NULL,
+	account_number varchar(25) NULL UNIQUE,
+	routing_number varchar(12) NULL,
 	name varchar (200) NOT NULL,
 	balance decimal(10,2) NOT NULL,
-	available_balance varchar(200) NULL,
+	available_balance decimal (10,2) NULL,
     apr decimal (10,2) NULL,
     apy decimal (10,2) NULL,
     payment_due_date DATE NULL,
@@ -62,7 +62,7 @@ CREATE TABLE account (
 CREATE TABLE category (
 	category_id SERIAL,
 	name varchar(50) NOT NULL,
-    essential BOOLEAN NOT NULL,
+    essential boolean NOT NULL,
     user_id int NOT NULL,
 	CONSTRAINT PK_category PRIMARY KEY (category_id),
 	CONSTRAINT FK_category_user FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -72,18 +72,16 @@ CREATE TABLE category (
 CREATE TABLE time_span (
 	time_span_id SERIAL,
 	name varchar (50) NOT NULL,
-	multiple int NOT NULL,
-	CONSTRAINT PK_time_span PRIMARY KEY (time_span_id),
+	multiple decimal (5,3) NOT NULL,
+	CONSTRAINT PK_time_span PRIMARY KEY (time_span_id)
 );
--- CREATE UNIQUE INDEX IX_wishlist_item_wishlist_product ON wishlist_item(wishlist_id, product_id);
 
 -- account_type
 CREATE TABLE account_type (
 	account_type_id SERIAL,
 	name varchar (50) NOT NULL,
-	CONSTRAINT PK_account_type PRIMARY KEY (account_type_id),
+	CONSTRAINT PK_account_type PRIMARY KEY (account_type_id)
 );
--- CREATE UNIQUE INDEX IX_cart_item_user_product ON cart_item(user_id, product_id);
 
 -- payment_type
 CREATE TABLE payment_type (
@@ -111,11 +109,9 @@ CREATE TABLE transactions (
 -- planned_expense
 CREATE TABLE planned_expenses (
 	planned_expense_id SERIAL,
-	per_month_frequency decimal (10,2) NOT NULL,
 	frequency int NOT NULL,
 	time_span_id int NOT NULL,
 	single_amount decimal (10,2) NOT NULL,
-	monthly_amount decimal (10,2) NOT NULL,
 	category_id int NOT NULL,
 	active boolean NOT NULL,
 	expense_desc varchar (500) NULL,
@@ -125,6 +121,8 @@ CREATE TABLE planned_expenses (
 	CONSTRAINT FK_planned_expense_category FOREIGN KEY (category_id) REFERENCES (category_id),
 	CONSTRAINT FK_planned_expense_user FOREIGN KEY (user_id) REFERENCES (user_id)
 );
+-- Derive a 'per_month_frequency decimal (10,2)' collumn when collecting 'frequency' and 'time-span' by mulitplying the frequency by the time-span multiple.
+-- This will be used to find the 'monthly_amount decimal (10,2)' 
 
 -- recurring_payment
 CREATE TABLE recurring_payment (
@@ -135,8 +133,8 @@ CREATE TABLE recurring_payment (
 	category_id int NOT NULL,
 	payment_type_id int NOT NULL,
 	active boolean NOT NULL,
-	payment_desc varchar (500),
-	link varchar (500),
+	payment_desc varchar (500) NULL,
+	link varchar (500) NULL,
 	user_id int NOT NULL
 	CONSTRAINT PK_recurring_payment PRIMARY KEY (recurring_payment_id),
 	CONSTRAINT FK_reccuring_payment_account FOREIGN KEY (account_id) REFERENCES (account_id),
@@ -168,15 +166,20 @@ INSERT INTO category (name, essential, user_id) VALUES
 	
 -- Time Span
 INSERT INTO time_span (name, multiple) VALUES
-	();
+	('week', 4),
+	('month', 1),
+	('year', 0.083);
 
 -- Account Types
 INSERT INTO account_type (name) VALUES
-	();
+	('checking'),
+	('saving'),
+	('credit');
 
 -- Payment Types
 INSERT INTO payment_type (name) VALUES
-	();
+	('bill'),
+	('subscription');
 
 -- Transactions
 INSERT INTO transactions (transaction_date, amount, account_id, category_id, vendor, transaction_desc, user_id) VALUES
