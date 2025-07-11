@@ -4,15 +4,16 @@ BEGIN TRANSACTION;
 -- *************************************************************************************************
 -- Drop all db objects in the proper order
 -- *************************************************************************************************
-DROP TABLE IF EXISTS bank;
-DROP TABLE IF EXISTS account;
-DROP TABLE IF EXISTS category;
-DROP TABLE IF EXISTS time_span;
-DROP TABLE IF EXISTS account_type;
-DROP TABLE IF EXISTS payment_type;
-DROP TABLE IF EXISTS transactions;
-DROP TABLE IF EXISTS planned_expense;
 DROP TABLE IF EXISTS recurring_payment;
+DROP TABLE IF EXISTS planned_expense;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS category;
+DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS bank;
+DROP TABLE IF EXISTS payment_type;
+DROP TABLE IF EXISTS account_type;
+DROP TABLE IF EXISTS time_span;
+DROP TABLE IF EXISTS users;
 
 -- *************************************************************************************************
 -- Create the tables and constraints
@@ -26,47 +27,6 @@ CREATE TABLE users (
 	role varchar(50) NOT NULL,
 	name varchar(50) NOT NULL,
 	CONSTRAINT PK_user PRIMARY KEY (user_id)
-);
-
--- bank
-CREATE TABLE bank (
-	bank_id SERIAL,
-	name varchar(70) NOT NULL UNIQUE,
-	nickname varchar(200) NULL,
-	user_id int NOT NULL,
-	CONSTRAINT PK_bank PRIMARY KEY (bank_id),
-    CONSTRAINT FK_bank_users FOREIGN KEY (user_id) REFERENCES users(user_id)
-);
-
--- account
-CREATE TABLE account (
-	account_id SERIAL,
-	account_number varchar(25) NULL UNIQUE,
-	routing_number varchar(12) NULL,
-	name varchar (200) NOT NULL,
-	due_balance decimal(20,2) NOT NULL,
-	total_balance decimal (20,2) NULL,
-    apr decimal (10,2) NULL,
-    apy decimal (10,2) NULL,
-    payment_due_date DATE NULL,
-    account_type_id int NOT NULL,
-    bank_id int NULL,
-	user_id int NOT NULL,
-	CONSTRAINT PK_product PRIMARY KEY (product_id),
-    CONSTRAINT FK_account_users FOREIGN KEY (user_id) REFERENCES users(user_id),
-    CONSTRAINT FK_account_bank FOREIGN KEY (bank_id) REFERENCES bank(bank_id),
-    CONSTRAINT FK_account_account_type FOREIGN KEY (account_type_id) REFERENCES account_type(account_type_id)
-);
--- For credit cards derive available balance from total - due
-
--- category
-CREATE TABLE category (
-	category_id SERIAL,
-	name varchar(50) NOT NULL,
-    essential boolean NOT NULL,
-    user_id int NOT NULL,
-	CONSTRAINT PK_category PRIMARY KEY (category_id),
-	CONSTRAINT FK_category_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- time_span
@@ -91,6 +51,47 @@ CREATE TABLE payment_type (
 	CONSTRAINT PK_payment_type PRIMARY KEY (payment_type_id)
 );
 
+-- bank
+CREATE TABLE bank (
+	bank_id SERIAL,
+	name varchar(70) NOT NULL UNIQUE,
+	nickname varchar(200) NULL,
+	user_id int NOT NULL,
+	CONSTRAINT PK_bank PRIMARY KEY (bank_id),
+    CONSTRAINT FK_bank_users FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- account
+CREATE TABLE account (
+	account_id SERIAL,
+	account_number varchar(25) NULL,
+	routing_number varchar(12) NULL,
+	name varchar (200) NOT NULL,
+	due_balance decimal(12,2) NOT NULL,
+	total_balance decimal (12,2) NULL,
+    apr decimal (10,2) NULL,
+    apy decimal (10,2) NULL,
+    payment_due_date DATE NULL,
+    account_type_id int NOT NULL,
+    bank_id int NULL,
+	user_id int NOT NULL,
+	CONSTRAINT PK_account PRIMARY KEY (account_id),
+    CONSTRAINT FK_account_users FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT FK_account_bank FOREIGN KEY (bank_id) REFERENCES bank(bank_id),
+    CONSTRAINT FK_account_account_type FOREIGN KEY (account_type_id) REFERENCES account_type(account_type_id)
+);
+-- For credit cards derive available balance from total - due
+
+-- category
+CREATE TABLE category (
+	category_id SERIAL,
+	name varchar(50) NOT NULL,
+    essential boolean NOT NULL,
+    user_id int NOT NULL,
+	CONSTRAINT PK_category PRIMARY KEY (category_id),
+	CONSTRAINT FK_category_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
 -- transactions (name is pluralized because 'transaction' is a SQL keyword)
 CREATE TABLE transactions (
 	transactions_id SERIAL,
@@ -108,7 +109,7 @@ CREATE TABLE transactions (
 );
 
 -- planned_expense
-CREATE TABLE planned_expenses (
+CREATE TABLE planned_expense (
 	planned_expense_id SERIAL,
 	frequency int NOT NULL,
 	time_span_id int NOT NULL,
@@ -116,7 +117,7 @@ CREATE TABLE planned_expenses (
 	category_id int NOT NULL,
 	active boolean NOT NULL,
 	expense_desc varchar (500) NULL,
-	user_id int NOT NULL
+	user_id int NOT NULL,
 	CONSTRAINT PK_planned_expense PRIMARY KEY (planned_expense_id),
 	CONSTRAINT FK_planned_expense_time_span FOREIGN KEY (time_span_id) REFERENCES time_span(time_span_id),
 	CONSTRAINT FK_planned_expense_category FOREIGN KEY (category_id) REFERENCES category(category_id),
@@ -136,12 +137,12 @@ CREATE TABLE recurring_payment (
 	active boolean NOT NULL,
 	payment_desc varchar (500) NULL,
 	link varchar (500) NULL,
-	user_id int NOT NULL
+	user_id int NOT NULL,
 	CONSTRAINT PK_recurring_payment PRIMARY KEY (recurring_payment_id),
-	CONSTRAINT FK_reccuring_payment_account FOREIGN KEY (account_id) REFERENCES account(account_id),
-	CONSTRAINT FK_reccuring_payment_category FOREIGN KEY (category_id) REFERENCES category(category_id),
-	CONSTRAINT FK_reccuring_payment_payment_type FOREIGN KEY (payment_type_id) REFERENCES payment_type(payment_type_id),
-	CONSTRAINT FK_reccuring_payment_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+	CONSTRAINT FK_recuring_payment_account FOREIGN KEY (account_id) REFERENCES account(account_id),
+	CONSTRAINT FK_recuring_payment_category FOREIGN KEY (category_id) REFERENCES category(category_id),
+	CONSTRAINT FK_recuring_payment_payment_type FOREIGN KEY (payment_type_id) REFERENCES payment_type(payment_type_id),
+	CONSTRAINT FK_recuring_payment_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- *************************************************************************************************
