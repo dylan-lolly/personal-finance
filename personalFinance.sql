@@ -18,6 +18,8 @@ DROP TABLE IF EXISTS users;
 -- *************************************************************************************************
 -- Create the tables and constraints
 -- *************************************************************************************************
+-- Run individually to avoid FK errors
+-- *************************************************************************************************
 
 -- users (name is pluralized because 'user' is a SQL keyword)
 CREATE TABLE users (
@@ -67,8 +69,8 @@ CREATE TABLE account (
 	account_number varchar(25) NULL,
 	routing_number varchar(12) NULL,
 	name varchar (200) NOT NULL,
-	due_balance decimal(12,2) NOT NULL,
-	total_balance decimal (12,2) NULL,
+	due_balance decimal(12,2) NULL,
+	total_balance decimal (12,2) NOT NULL,
     apr decimal (10,2) NULL,
     apy decimal (10,2) NULL,
     payment_due_date DATE NULL,
