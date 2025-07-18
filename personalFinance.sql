@@ -96,7 +96,7 @@ CREATE TABLE category (
 
 -- transactions (name is pluralized because 'transaction' is a SQL keyword)
 CREATE TABLE transactions (
-	transactions_id SERIAL,
+	transaction_id SERIAL,
 	transaction_date DATE NOT NULL,
 	amount decimal (10,2) NOT NULL,
 	vendor varchar (70) NULL,
