@@ -3,6 +3,7 @@ package com.lolly.dao;
 import com.lolly.exception.DaoException;
 import com.lolly.model.Category;
 import com.lolly.model.Transaction;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -131,6 +132,69 @@ public class JdbcTransactionDao {
             throw new DaoException("Unable to connect to server or database", e);
         }
         return transactions;
+    }
+
+    public Transaction updateTransaction(Transaction newTransaction) {
+        Transaction updatedTransaction = null;
+        String sql = "UPDATE transactions SET transaction_date = ?, amount = ?, vendor = ?, " +
+                "transaction_desc = ?, account_id = ?, category_id = ?, user_id = ? " +
+                "WHERE transaction_id = ?;";
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, newTransaction.getDate(), newTransaction.getAmount(),
+                    newTransaction.getVendor(), newTransaction.getDescription(), newTransaction.getAccountId(),
+                    newTransaction.getCategoryId(), newTransaction.getUserId(), newTransaction.getId());
+            if (rowsAffected == 0) {
+                throw new DaoException("Zero rows affected, expected at least one");
+            }
+            updatedTransaction = getTransactionById(newTransaction.getUserId(), newTransaction.getId());
+        }
+        catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Cannot connect to server or database", e);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return updatedTransaction;
+    }
+
+    public Transaction createTransaction(Transaction newTransaction) {
+        Transaction createdTransaction = null;
+        String sql = "INSERT INTO transactions (transaction_date, amount, vendor, " +
+                "transaction_desc, account_id, category_id, user_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING transaction_id;";
+
+        try {
+            int transactionId = jdbcTemplate.queryForObject(sql, int.class,
+                    newTransaction.getDate(), newTransaction.getAmount(), newTransaction.getVendor(),
+                    newTransaction.getDescription(), newTransaction.getAccountId(),
+                    newTransaction.getCategoryId(), newTransaction.getUserId());
+            createdTransaction = getTransactionById(newTransaction.getUserId(), transactionId);
+        }
+        catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Cannot connect to the server or database", e);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return createdTransaction;
+    }
+
+    public int deleteTransaction(int transactionId) {
+        int rowsAffected;
+        String sql = "DELETE FROM transactions WHERE transaction_id = ?;";
+        try {
+            rowsAffected = jdbcTemplate.update(sql, transactionId);
+            if (rowsAffected == 0) {
+                throw new DaoException("Zero rows affected, expected at least one");
+            }
+        }
+        catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Cannot connect to server or database", e);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return rowsAffected;
     }
 
 //    private List<Transaction> template() {
