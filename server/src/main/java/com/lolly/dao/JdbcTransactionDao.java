@@ -21,11 +21,11 @@ public class JdbcTransactionDao {
     public JdbcTransactionDao(JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
 
-    public Transaction getTransactionById(int userId, int transactionId) {
+    public Transaction getTransactionById(int transactionId) {
         Transaction transaction = null;
-        String sql = "SELECT * FROM transactions WHERE user_id = ? AND transaction_id = ?;";
+        String sql = "SELECT * FROM transactions WHERE transaction_id = ?;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId, transactionId);
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transactionId);
             if (result.next()) {
                 transaction = mapRowToTransaction(result);
             }
@@ -36,12 +36,12 @@ public class JdbcTransactionDao {
         return transaction;
     }
 
-    public List<Transaction> getTransactionByUser(int id){
+    public List<Transaction> getTransactionsByUser(int userId){
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT * FROM transactions WHERE user_id = ? ORDER BY transaction_date;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, id);
-            if (result.next()) {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId);
+            while (result.next()) {
                 Transaction transaction = mapRowToTransaction(result);
                 transactions.add(transaction);
             }
@@ -52,12 +52,12 @@ public class JdbcTransactionDao {
         return transactions;
     }
 
-    public List<Transaction> getTransactionByAccount(int userId, int accountId) {
+    public List<Transaction> getTransactionsByAccount(int accountId) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE user_id = ? AND account_id = ? ORDER BY transaction_date;";
+        String sql = "SELECT * FROM transactions WHERE account_id = ? ORDER BY transaction_date;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId, accountId);
-            if (result.next()) {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, accountId);
+            while (result.next()) {
                 Transaction transaction = mapRowToTransaction(result);
                 transactions.add(transaction);
             }
@@ -68,12 +68,12 @@ public class JdbcTransactionDao {
         return transactions;
     }
 
-    public List<Transaction> getTransactionsByCategory(int userId, int categoryId) {
+    public List<Transaction> getTransactionsByCategory(int categoryId) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE user_id = ? AND category_id = ? ORDER BY transaction_date;";
+        String sql = "SELECT * FROM transactions WHERE category_id = ? ORDER BY transaction_date;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId, categoryId);
-            if (result.next()) {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, categoryId);
+            while (result.next()) {
                 Transaction transaction = mapRowToTransaction(result);
                 transactions.add(transaction);
             }
@@ -84,12 +84,12 @@ public class JdbcTransactionDao {
         return transactions;
     }
 
-    public List<Transaction> getTransactionsByDate(int userId, Date date) {
+    public List<Transaction> getTransactionsByDate(Date date) {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE user_id = ? AND transaction_date = ? ORDER BY amount;";
+        String sql = "SELECT * FROM transactions WHERE transaction_date = ? ORDER BY amount;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId, date);
-            if (result.next()) {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, date);
+            while (result.next()) {
                 Transaction transaction = mapRowToTransaction(result);
                 transactions.add(transaction);
             }
@@ -100,13 +100,13 @@ public class JdbcTransactionDao {
         return transactions;
     }
 
-    public List<Transaction> getTransactionsByVendor(int userId, String vendor) {
+    public List<Transaction> getTransactionsByVendor(String vendor) {
         vendor = "%" + vendor + "%";
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE user_id = ? AND vendor ILIKE ? ORDER BY transaction_date;";
+        String sql = "SELECT * FROM transactions WHERE vendor ILIKE ? ORDER BY transaction_date;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId, vendor);
-            if (result.next()) {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, vendor);
+            while (result.next()) {
                 Transaction transaction = mapRowToTransaction(result);
                 transactions.add(transaction);
             }
@@ -117,13 +117,13 @@ public class JdbcTransactionDao {
         return transactions;
     }
 
-    public List<Transaction> getTransactionsByDescription(int userId, String description) {
+    public List<Transaction> getTransactionsByDescription(String description) {
         description = "%" + description + "%";
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE user_id = ? AND transaction_desc ILIKE ? ORDER BY transaction_date;";
+        String sql = "SELECT * FROM transactions WHERE transaction_desc ILIKE ? ORDER BY transaction_date;";
         try {
-            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, userId, description);
-            if (result.next()) {
+            SqlRowSet result = jdbcTemplate.queryForRowSet(sql, description);
+            while (result.next()) {
                 Transaction transaction = mapRowToTransaction(result);
                 transactions.add(transaction);
             }
@@ -142,11 +142,11 @@ public class JdbcTransactionDao {
         try {
             int rowsAffected = jdbcTemplate.update(sql, newTransaction.getDate(), newTransaction.getAmount(),
                     newTransaction.getVendor(), newTransaction.getDescription(), newTransaction.getAccountId(),
-                    newTransaction.getCategoryId(), newTransaction.getUserId(), newTransaction.getId());
+                    newTransaction.getCategoryId(), newTransaction.getId());
             if (rowsAffected == 0) {
                 throw new DaoException("Zero rows affected, expected at least one");
             }
-            updatedTransaction = getTransactionById(newTransaction.getUserId(), newTransaction.getId());
+            updatedTransaction = getTransactionById(newTransaction.getId());
         }
         catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Cannot connect to server or database", e);
@@ -168,7 +168,7 @@ public class JdbcTransactionDao {
                     newTransaction.getDate(), newTransaction.getAmount(), newTransaction.getVendor(),
                     newTransaction.getDescription(), newTransaction.getAccountId(),
                     newTransaction.getCategoryId(), newTransaction.getUserId());
-            createdTransaction = getTransactionById(newTransaction.getUserId(), transactionId);
+            createdTransaction = getTransactionById(transactionId);
         }
         catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Cannot connect to the server or database", e);

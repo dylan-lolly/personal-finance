@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin
@@ -20,10 +22,92 @@ public class TransactionController {
 
     public TransactionController(JdbcTransactionDao transactionDao) { this.transactionDao = transactionDao; }
 
-    @RequestMapping(path = "", method = RequestMethod.GET)
-    public List<Transaction> getTransactions(@RequestParam(defaultValue = "0") String userId) {
+    @GetMapping(path = "/{transactionId}")
+    public TransactionDto getTransactionById(@PathVariable int transactionId) {
+        Transaction transaction;
+        try {
+            transaction = transactionDao.getTransactionById(transactionId);
+        }
+        catch (DaoException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return convertEntityToDto(transaction);
+    }
+
+    @RequestMapping(path = "/user", method = RequestMethod.GET)
+    public List<TransactionDto> getTransactionsByUser(@RequestParam(defaultValue = "") String userId) {
         if (!userId.equals("")) {
-            return transactionDao.getTransactionByUser(Integer.parseInt(userId));
+            List<TransactionDto> transactionDtos = new ArrayList<>();
+            List<Transaction> transactions = transactionDao.getTransactionsByUser(Integer.parseInt(userId));
+            for (Transaction transaction : transactions) {
+                transactionDtos.add(convertEntityToDto(transaction));
+            }
+            return transactionDtos;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(path = "/account", method = RequestMethod.GET)
+    public List<TransactionDto> getTransactionsByAccount(@RequestParam(defaultValue = "") String accountId) {
+        if (!accountId.equals("")) {
+            List<TransactionDto> transactionDtos = new ArrayList<>();
+            List<Transaction> transactions = transactionDao.getTransactionsByAccount(Integer.parseInt(accountId));
+            for (Transaction transaction : transactions) {
+                transactionDtos.add(convertEntityToDto(transaction));
+            }
+            return transactionDtos;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(path = "/category")
+    public List<TransactionDto> getTransactionsByCategory(@RequestParam(defaultValue = "") String categoryId) {
+        if (!categoryId.equals("")) {
+            List<TransactionDto> transactionDtos = new ArrayList<>();
+            List<Transaction> transactions = transactionDao.getTransactionsByCategory(Integer.parseInt(categoryId));
+            for (Transaction transaction : transactions) {
+                transactionDtos.add(convertEntityToDto(transaction));
+            }
+            return transactionDtos;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(path = "/date")
+    public List<TransactionDto> getTransactionsByDate(@RequestParam(defaultValue = "") String date) {
+        if (!date.equals("")) {
+            List<TransactionDto> transactionDtos = new ArrayList<>();
+            List<Transaction> transactions = transactionDao.getTransactionsByDate(Date.valueOf(date));
+            for (Transaction transaction : transactions) {
+                transactionDtos.add(convertEntityToDto(transaction));
+            }
+            return transactionDtos;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(path = "/vendor")
+    public List<TransactionDto> getTransactionsByVendor(@RequestParam(defaultValue = "") String vendor) {
+        if (!vendor.equals("")) {
+            List<TransactionDto> transactionDtos = new ArrayList<>();
+            List<Transaction> transactions = transactionDao.getTransactionsByVendor(vendor);
+            for (Transaction transaction : transactions) {
+                transactionDtos.add(convertEntityToDto(transaction));
+            }
+            return transactionDtos;
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(path = "/description")
+    public List<TransactionDto> getTransactionsByDescription(@RequestParam(defaultValue = "") String description) {
+        if (!description.equals("")) {
+            List<TransactionDto> transactionDtos = new ArrayList<>();
+            List<Transaction> transactions = transactionDao.getTransactionsByDescription(description);
+            for (Transaction transaction : transactions) {
+                transactionDtos.add(convertEntityToDto(transaction));
+            }
+            return transactionDtos;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
