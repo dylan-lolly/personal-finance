@@ -11,6 +11,7 @@ public class Transaction {
     private BigDecimal amount;
     private String vendor;
     private String description;
+    private String receiptUrl;
     private int accountId;
     private int categoryId;
     private int userId;
@@ -18,12 +19,13 @@ public class Transaction {
     public Transaction() {}
 
     public Transaction(int id, Date date, BigDecimal amount, String vendor, String description,
-                       int accountId, int categoryId, int userId) {
+                       String receiptUrl, int accountId, int categoryId, int userId) {
         this.id = id;
         this.date = date;
         this.amount = amount;
         this.vendor = vendor;
         this.description = description;
+        this.receiptUrl = receiptUrl;
         this.accountId = accountId;
         this.categoryId = categoryId;
         this.userId = userId;
@@ -49,6 +51,8 @@ public class Transaction {
     public String getDescription() {
         return description;
     }
+
+    public String getReceiptUrl() { return receiptUrl; }
 
     public int getAccountId() {
         return accountId;
@@ -79,6 +83,8 @@ public class Transaction {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setReceiptUrl(String receiptUrl) { this.receiptUrl = receiptUrl; }
 
     public void setAccountId(int accountId) {
         this.accountId = accountId;

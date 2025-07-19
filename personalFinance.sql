@@ -100,7 +100,8 @@ CREATE TABLE transactions (
 	transaction_date DATE NOT NULL,
 	amount decimal (10,2) NOT NULL,
 	vendor varchar (70) NULL,
-	transaction_desc varchar (500) NULL,
+	transaction_desc text NULL,
+	receipt_url text NULL
 	account_id int NOT NULL,
 	category_id int NOT NULL,
 	user_id int NOT NULL,
@@ -118,7 +119,7 @@ CREATE TABLE planned_expense (
 	single_amount decimal (10,2) NOT NULL,
 	category_id int NOT NULL,
 	active boolean NOT NULL,
-	expense_desc varchar (500) NULL,
+	expense_desc text NULL,
 	user_id int NOT NULL,
 	CONSTRAINT PK_planned_expense PRIMARY KEY (planned_expense_id),
 	CONSTRAINT FK_planned_expense_time_span FOREIGN KEY (time_span_id) REFERENCES time_span(time_span_id),
@@ -137,8 +138,8 @@ CREATE TABLE recurring_payment (
 	category_id int NOT NULL,
 	payment_type_id int NOT NULL,
 	active boolean NOT NULL,
-	payment_desc varchar (500) NULL,
-	link varchar (500) NULL,
+	payment_desc text NULL,
+	payment_link text NULL,
 	user_id int NOT NULL,
 	CONSTRAINT PK_recurring_payment PRIMARY KEY (recurring_payment_id),
 	CONSTRAINT FK_recuring_payment_account FOREIGN KEY (account_id) REFERENCES account(account_id),
@@ -186,7 +187,7 @@ INSERT INTO payment_type (name) VALUES
 	('subscription');
 
 -- Transactions
-INSERT INTO transactions (transaction_date, amount, account_id, category_id, vendor, transaction_desc, user_id) VALUES
+INSERT INTO transactions (transaction_date, amount, account_id, category_id, vendor, transaction_desc, receipt user_id) VALUES
 	();
 
 -- Planned Expenses
@@ -194,7 +195,7 @@ INSERT INTO planned_expense (per_month_frequency, frequency, time_span_id, singl
 	();
 
 -- Recurring Payments
-INSERT INTO recurring_payment (day_of_month_due, account_id, amount, category_id, payment_type_id, active, payment_desc, link, user_id) VALUES
+INSERT INTO recurring_payment (day_of_month_due, account_id, amount, category_id, payment_type_id, active, payment_desc, payment_link, user_id) VALUES
 	();
 
 COMMIT TRANSACTION;

@@ -153,6 +153,7 @@ public class TransactionController {
         dto.setAmount(transaction.getAmount());
         dto.setVendor(transaction.getVendor());
         dto.setDescription(transaction.getDescription());
+        dto.setReceiptUrl(transaction.getReceiptUrl());
         dto.setAccountId(transaction.getAccountId());
         dto.setCategoryId(transaction.getCategoryId());
         dto.setUserId(transaction.getUserId());
@@ -166,6 +167,7 @@ public class TransactionController {
         entity.setAmount(dto.getAmount());
         entity.setVendor(dto.getVendor());
         entity.setDescription(dto.getDescription());
+        entity.setReceiptUrl(dto.getReceiptUrl());
         entity.setAccountId(dto.getAccountId());
         entity.setCategoryId(dto.getCategoryId());
         entity.setUserId(dto.getUserId());

@@ -137,12 +137,13 @@ public class JdbcTransactionDao {
     public Transaction updateTransaction(Transaction newTransaction) {
         Transaction updatedTransaction = null;
         String sql = "UPDATE transactions SET transaction_date = ?, amount = ?, vendor = ?, " +
-                "transaction_desc = ?, account_id = ?, category_id = ?, user_id = ? " +
+                "transaction_desc = ?, receipt_url = ?, account_id = ?, category_id = ?, user_id = ? " +
                 "WHERE transaction_id = ?;";
         try {
             int rowsAffected = jdbcTemplate.update(sql, newTransaction.getDate(), newTransaction.getAmount(),
-                    newTransaction.getVendor(), newTransaction.getDescription(), newTransaction.getAccountId(),
-                    newTransaction.getCategoryId(), newTransaction.getId());
+                    newTransaction.getVendor(), newTransaction.getDescription(), newTransaction.getReceiptUrl(),
+                    newTransaction.getAccountId(), newTransaction.getCategoryId(), newTransaction.getUserId(),
+                    newTransaction.getId());
             if (rowsAffected == 0) {
                 throw new DaoException("Zero rows affected, expected at least one");
             }
@@ -160,13 +161,13 @@ public class JdbcTransactionDao {
     public Transaction createTransaction(Transaction newTransaction) {
         Transaction createdTransaction = null;
         String sql = "INSERT INTO transactions (transaction_date, amount, vendor, " +
-                "transaction_desc, account_id, category_id, user_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING transaction_id;";
+                "transaction_desc, receipt_url, account_id, category_id, user_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING transaction_id;";
 
         try {
             int transactionId = jdbcTemplate.queryForObject(sql, int.class,
                     newTransaction.getDate(), newTransaction.getAmount(), newTransaction.getVendor(),
-                    newTransaction.getDescription(), newTransaction.getAccountId(),
+                    newTransaction.getDescription(), newTransaction.getReceiptUrl(), newTransaction.getAccountId(),
                     newTransaction.getCategoryId(), newTransaction.getUserId());
             createdTransaction = getTransactionById(transactionId);
         }
@@ -221,6 +222,7 @@ public class JdbcTransactionDao {
         transaction.setAmount(sr.getBigDecimal("amount"));;
         transaction.setVendor(sr.getString("vendor"));
         transaction.setDescription(sr.getString("transaction_desc"));
+        transaction.setReceiptUrl(sr.getString("receipt_url"));
         transaction.setAccountId(sr.getInt("account_id"));
         transaction.setCategoryId(sr.getInt("category_id"));
         transaction.setUserId(sr.getInt("user_id"));
