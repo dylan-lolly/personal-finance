@@ -17,11 +17,14 @@ import java.nio.file.Paths;
 @RequestMapping("/images")
 public class FileController {
 
+    // Base path for image file location
+    String pathString = "src/main/resources/static/images/";
+
     // Endpoint to serve image file
     @GetMapping("")
-    public ResponseEntity<Resource> getImage() throws Exception {
+    public ResponseEntity<Resource> getImage(String receiptUrl) throws Exception {
         // Path to the image file
-        Path path = Paths.get("src/main/resources/static/images/imageexample.png");
+        Path path = Paths.get(pathString + receiptUrl);
         // Load the resource
         Resource resource = new UrlResource(path.toUri());
         // Return ResponseEntity with image content type
